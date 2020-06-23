@@ -1,0 +1,28 @@
+[alias]
+    co = checkout
+    ci = commit
+    stat = status
+[mirror]
+    summary = true
+[apply]
+    whitespace = nowarn
+[color]
+    ui = true
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+[color "diff"]
+    meta = white
+    frag = magenta bold
+    old = red
+    new = green 
+    func = yellow
+    commit = white
+    whitespace = magenta bold
+[color "status"]
+    added = green
+    changed = yellow
+    untracked = red
+[include]
+    path = ~/.gitconfig_local

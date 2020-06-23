@@ -1,0 +1,100 @@
+# Tweaker theme
+
+_prompt_helloworld_title_len=60
+_prompt_helloworld_tab_len=30
+
+TRAPWINCH() { zle && { zle reset-prompt; zle -R } }
+
+function _prompt_helloworld_titlebar {
+    case $TERM in
+        xterm*|Apple_Terminal|rxvt*|(dt|k|E)term)
+            printf "\e]1;%s\a" "${(V%)1}"
+            printf "\e]2;%s\a" "${(V%)2}"
+            ;;
+        tmux*)
+            # tmux wants a hybrid of xterm and screen for some reason
+            printf "\ek%s\e\\" "${(V%)1}"
+            printf "\e]0;%s\a" "${(V%)2}"
+            ;;
+        screen*)
+            printf "\ek%s\e\\" "${(V%)1}"
+            ;;
+        *)
+            # if terminfo has tsl/fsl capabilities, use those.
+            [[ -n ${terminfo[tsl]} && -n ${terminfo[fsl]} ]] && \
+                printf "${terminfo[tsl]}%s${terminfo[fsl]}" "${(V%)2}"
+            ;;
+    esac
+}
+
+function _prompt_helloworld_perlbrew {
+    [ $PERLBREW_PERL ] || return 0
+    local perlbrew_prompt="%F{magenta}${PERLBREW_PERL#perl-}%f"
+    printf " perl:%s" "${(%)perlbrew_prompt}"
+}
+
+function _prompt_helloworld_virtualenv {
+    [ $VIRTUAL_ENV ] || return 0
+    local venv_prompt="%F{magenta}${VIRTUAL_ENV:t}%f"
+    printf " venv:%s" "${(%)venv_prompt}"
+}
+
+function _prompt_helloworld_git {
+    [[ $_prompt_helloworld_git == 1 ]] || return 0
+
+    local git_status
+    local ref=`git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null` \
+        && git_status="%F{yellow}${ref}%f" \
+        || return 0
+
+    [[ -n `git status --porcelain --ignore-submodules=dirty | tail -n 1` ]] \
+        && git_status+=" %F{red}✘%f" \
+        || git_status+=" %F{green}o%f"
+
+    printf " ± %s" "${(%)git_status}"
+}
+
+function _prompt_helloworld_chpwd {
+    (( $+commands[git] )) || return 0
+
+    git rev-parse --git-dir >/dev/null 2>&1
+    _prompt_helloworld_git=$(($? ? 0 : 1))
+}
+
+# try to show user@host when it might be useful
+function _prompt_helloworld_update_title {
+    local long="$1" short="$1"
+    [[ -n "$STY" || -n "$TMUX" ]] \
+        && long="%n@%m: $long" \
+        || { [[ -n "$SSH_CLIENT" ]] && { long="%n@%m: $long" ; short=$long } }
+    _prompt_helloworld_titlebar "%${_prompt_helloworld_tab_len}>...>$short%<<" "%${_prompt_helloworld_title_len}>...>$long%<<"
+}
+
+# when no command is running, set the title to the current directory
+function _prompt_helloworld_precmd { _prompt_helloworld_update_title "%~" }
+
+# when a command is running, set the title to the command line
+function _prompt_helloworld_preexec { _prompt_helloworld_update_title "$1" }
+ 
+function prompt_helloworld_setup {
+    setopt LOCAL_OPTIONS
+    unsetopt XTRACE KSH_ARRAYS
+    prompt_opts=(cr percent subst)
+
+    autoload -Uz add-zsh-hook
+    autoload -Uz colors && colors
+    zmodload zsh/terminfo
+
+    add-zsh-hook chpwd _prompt_helloworld_chpwd && _prompt_helloworld_chpwd
+    add-zsh-hook precmd _prompt_helloworld_precmd
+    add-zsh-hook preexec _prompt_helloworld_preexec
+
+    PROMPT=$'\n%F{green}%n@%m%f %F{cyan}%~%f$(_prompt_helloworld_virtualenv)$(_prompt_helloworld_perlbrew)$(_prompt_helloworld_git)\n\$ '
+    SPROMPT='zsh: correct %F{yellow}%R%f to %F{green}%r%f [nyae]? '
+}
+
+function prompt_helloworld_preview {
+    prompt_preview_theme 'helloworld'
+}
+
+prompt_helloworld_setup "$@"

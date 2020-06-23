@@ -1,0 +1,12 @@
+G=${*//#(#m)?/[$MATCH]}                # "asdf" -> "[a]sdf"
+case $OSTYPE {
+    solaris*)
+        # This should probably be more specific, Sol11/OSOL uses gnu utils
+        ps -ef | head -1
+        ps -ef | grep -i $G
+        ;;
+    *)
+        ps uwww | head -1
+        ps auxwww | grep -i $G
+        ;;
+}
