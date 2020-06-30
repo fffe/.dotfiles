@@ -107,6 +107,8 @@ autoload -Uz url-quote-magic && zle -N self-insert url-quote-magic
     export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=red,underline'
 
     zmodload zsh/terminfo
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
     bindkey "$terminfo[kcuu1]" history-substring-search-up
     bindkey "$terminfo[kcud1]" history-substring-search-down
     bindkey -M emacs '^P' history-substring-search-up
