@@ -6,12 +6,12 @@ setopt EXTENDED_GLOB        # adds #, ~ and ^ to globbing
 setopt EXTENDED_HISTORY     # adds timestamps and duration to history file
 setopt HIST_FCNTL_LOCK      # use fcntl for locking histfile, if available
 setopt HIST_FIND_NO_DUPS    # ignore duplicate commands while searching history
-setopt HIST_NO_STORE        # son't save "history" in the history
 setopt HIST_REDUCE_BLANKS   # get rid of unnecessary whitespace
 setopt INC_APPEND_HISTORY   # append commands to the shared history immediately, rather than on shell exit
 setopt PUSHD_IGNORE_DUPS    # don't add duplicate entries to the stack
 setopt PUSHD_SILENT         # don't print directory stack after pushd/popd
 setopt PUSHD_TO_HOME        # "pushd" == "pushd $HOME" 
+setopt REMATCH_PCRE         # use PCRE
 
 export HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
 export HISTSIZE=5000
@@ -98,37 +98,6 @@ autoload -Uz url-quote-magic && zle -N self-insert url-quote-magic
     for func in ${ZDOTDIR:-$HOME}/.zsh/functions/*; do autoload -z ${func:t} ; done
 }
 
-# enable zsh-history-substring-search
-[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-history-substring-search.zsh ]] && {
-    source ${ZDOTDIR:-$HOME}/.zsh/zsh-history-substring-search.zsh
-
-    # black on yellow for history matches
-    export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='fg=green,bold,underline'
-    export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=red,underline'
-
-    zmodload zsh/terminfo
-    bindkey '^[[A' history-substring-search-up
-    bindkey '^[[B' history-substring-search-down
-    bindkey "$terminfo[kcuu1]" history-substring-search-up
-    bindkey "$terminfo[kcud1]" history-substring-search-down
-    bindkey -M emacs '^P' history-substring-search-up
-    bindkey -M emacs '^N' history-substring-search-down
-    bindkey -M vicmd 'k' history-substring-search-up
-    bindkey -M vicmd 'j' history-substring-search-down
-}
-
-# enable zsh-autosuggestions
-[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh ]] && {
-    source ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh
-
-    # black on yellow for history matches
-    #export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
-    export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history)
-    export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=60
-    export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-    bindkey '^ ' autosuggest-accept
-}
-
 # some completion defaults
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
@@ -165,3 +134,41 @@ zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 # load local configuration if it exists
 [[ -e ${HOME}/.zshrc.local ]] && source ${HOME}/.zshrc.local
+
+# enable zsh-autosuggestions
+[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh ]] && {
+    source ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh
+
+    # black on yellow for history matches
+    #export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
+    export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history)
+    export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=60
+    export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+    bindkey '^ ' autosuggest-accept
+}
+
+# enable zsh-syntax-highlighting
+[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && {
+    source ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets regexp root)
+}
+
+# enable zsh-history-substring-search
+# this must come after zsh-syntax-highlighting
+[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-history-substring-search.zsh ]] && {
+    source ${ZDOTDIR:-$HOME}/.zsh/zsh-history-substring-search.zsh
+
+    # black on yellow for history matches
+    export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='fg=green,bold,underline'
+    export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=red,underline'
+
+    zmodload zsh/terminfo
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+    bindkey "$terminfo[kcuu1]" history-substring-search-up
+    bindkey "$terminfo[kcud1]" history-substring-search-down
+    bindkey -M emacs '^P' history-substring-search-up
+    bindkey -M emacs '^N' history-substring-search-down
+    bindkey -M vicmd 'k' history-substring-search-up
+    bindkey -M vicmd 'j' history-substring-search-down
+}
