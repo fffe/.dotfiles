@@ -30,7 +30,7 @@ set statusline=%<%f\ %y\ [%{strlen(&fenc)?&fenc:&enc}]\ %m%h%r%=col=%c%V\ row=%l
 " different setting for plain text or email
 au BufEnter * call Checkfiletype()
 func! Checkfiletype()
-    if &filetype == "" || &filetype == "mail"
+    if &filetype == ""
         setlocal fileformats=unix
         setlocal noautoindent
         setlocal nosmartindent
@@ -39,10 +39,6 @@ func! Checkfiletype()
         setlocal spell spelllang=en
         setlocal textwidth=70           " max line length 70 chars
         setlocal formatoptions+=t       " wrap lines longer than textwidth
-    endif
-    if &filetype == "mail"
-        " use a statusline that only shows position for mail
-        set statusline=%=col=%c%V\ row=%l/%L\ %P
     endif
     return
 endfunc
