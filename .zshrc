@@ -117,6 +117,18 @@ autoload -Uz url-quote-magic && zle -N self-insert url-quote-magic
     bindkey -M vicmd 'j' history-substring-search-down
 }
 
+# enable zsh-autosuggestions
+[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh ]] && {
+    source ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh
+
+    # black on yellow for history matches
+    #export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
+    export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history)
+    export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=60
+    export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+    bindkey '^ ' autosuggest-accept
+}
+
 # some completion defaults
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
