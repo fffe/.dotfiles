@@ -135,22 +135,27 @@ zstyle ':completion:*:manuals.(^1*)' insert-sections true
 # load local configuration if it exists
 [[ -e ${HOME}/.zshrc.local ]] && source ${HOME}/.zshrc.local
 
-# enable zsh-autosuggestions
-[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh ]] && {
-    source ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh
+# These don't work very nicely over high-latency connections (or mosh), but
+# they're nice to have. Disable them, and toggle on in ~/.zsh_local if you want
+[[ -z "${ZSH_IS_RUNNING_LOCALLY}" ]] || {
+    echo "b: [${ZSH_IS_RUNNING_LOCALLY}]"
+    # enable zsh-syntax-highlighting
+    [[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && {
+        source ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+        ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets regexp root)
+    }
 
-    # black on yellow for history matches
-    #export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
-    export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history)
-    export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=60
-    export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-    bindkey '^ ' autosuggest-accept
-}
+    # enable zsh-autosuggestions
+    [[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh ]] && {
+        source ${ZDOTDIR:-$HOME}/.zsh/zsh-autosuggestions.zsh
 
-# enable zsh-syntax-highlighting
-[[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && {
-    source ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets regexp root)
+        # black on yellow for history matches
+        #export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
+        export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history)
+        export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=60
+        export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+        bindkey '^ ' autosuggest-accept
+    }
 }
 
 # enable zsh-history-substring-search
