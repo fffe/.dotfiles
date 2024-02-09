@@ -79,7 +79,7 @@ function _prompt_helloworld_preexec { _prompt_helloworld_update_title "$1" }
 function prompt_helloworld_setup {
     setopt LOCAL_OPTIONS
     unsetopt XTRACE KSH_ARRAYS
-    prompt_opts=(cr percent subst)
+    prompt_opts=(cr sp percent subst)
 
     autoload -Uz add-zsh-hook
     autoload -Uz colors && colors

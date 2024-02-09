@@ -11,7 +11,6 @@ setopt INC_APPEND_HISTORY   # append commands to the shared history immediately,
 setopt PUSHD_IGNORE_DUPS    # don't add duplicate entries to the stack
 setopt PUSHD_SILENT         # don't print directory stack after pushd/popd
 setopt PUSHD_TO_HOME        # "pushd" == "pushd $HOME" 
-setopt REMATCH_PCRE         # use PCRE
 
 export HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
 export HISTSIZE=5000
@@ -142,7 +141,12 @@ zstyle ':completion:*:manuals.(^1*)' insert-sections true
     # enable zsh-syntax-highlighting
     [[ -e ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && {
         source ${ZDOTDIR:-$HOME}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-        ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets regexp root)
+        ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets root)
+
+        zmodload zsh/pcre 2>/dev/null && {
+            setopt REMATCH_PCRE
+            ZSH_HIGHLIGHT_HIGHLIGHTERS+=(regexp)
+        }
     }
 
     # enable zsh-autosuggestions
